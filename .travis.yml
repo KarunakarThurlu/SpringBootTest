@@ -1,0 +1,6 @@
+language: java
+jdk: 
+    - openjdk11 
+script: ./mvnw clean install
+notifications: 
+    email: karunakarthurlujava@gmail.com
