@@ -118,7 +118,7 @@ public class UserController {
 			Integer userID=user.getUserId();
 			Optional<User> userFromDB=userService.findById(userID);
     		if(userFromDB.isPresent()) {
-    			User updatedUser=foo.apply(userFromDB.get(), user);
+    			User updatedUser=usr.apply(userFromDB.get(), user);
     			return new Response<>(updatedUser,"User Details Updated Successfully",HttpStatus.OK);
     		}else {
     			return new Response<>(null,"User Not Found",HttpStatus.BAD_REQUEST);
@@ -127,7 +127,7 @@ public class UserController {
     	return new Response<>(null,"UserId is required for updating user.",HttpStatus.BAD_REQUEST);
     }
     
-    BinaryOperator<User> foo = (userFromDB,userFromUI) -> {
+    BinaryOperator<User> usr = (userFromDB,userFromUI) -> {
     	userFromDB.setUserDob(userFromUI.getUserDob());
     	userFromDB.setUserGender(userFromUI.getUserGender());
     	userFromDB.setUserName(userFromUI.getUserName());
