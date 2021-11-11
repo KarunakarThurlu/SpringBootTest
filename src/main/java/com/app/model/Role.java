@@ -48,10 +48,10 @@ public class Role  implements Serializable {
 	}
 	@Override
 	public String toString() {
-		return "{ roleId : " + roleId + ", roleName : " + roleName + " }";
+		return "Role [roleId=" + roleId + ", roleName=" + roleName + ", getRoleId()=" + getRoleId() + ", getRoleName()="
+				+ getRoleName() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
+				+ super.toString() + "]";
 	}
-	
-	
 
 }
 

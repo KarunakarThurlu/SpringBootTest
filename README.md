@@ -1,47 +1,188 @@
 # SpringBootTest
-=======
-**Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
+JUnit5 is a Unit Test Framework.
 
-When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
+To test specific task we need to write a test case(TestClass) with Annotations & Assertions.
 
-*We recommend that you open this README in another tab as you perform the tasks below. You can [watch our video](https://youtu.be/0ocf7u76WSo) for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving Bitbucket.*
+=============================================================JUNIT 5 Annotations======================================================
 
----
+JUNIT5 Annotations:-
+===================
 
-## Edit a file
 
-You’ll start by editing this README file to learn how to edit a file in Bitbucket.
+(1). @Test :-
+==============
+Specify this annotation on top of a test method
 
-1. Click **Source** on the left side.
-2. Click the README.md link from the list of files.
-3. Click the **Edit** button.
-4. Delete the following text: *Delete this line to make a change to the README from Bitbucket.*
-5. After making your change, click **Commit** and then **Commit** again in the dialog. The commit page will open and you’ll see the change you just made.
-6. Go back to the **Source** page.
+ex:-
+===
 
----
+@Test
+public void addTest(){
+    //addTestLogic
+}
 
-## Create a file
+(2). @TestMethodOrder :-
+=======================
+* We can write multiple  test methods inside test class , those methods are executed random by default.
+* we can specify our own order by using @TestMethodOrder at class level , @Order at method level.
 
-Next, you’ll add a new file to this repository.
+case(1): Order(1),Order(10),Order(5) ===>ThenExecuton Order is 1,5,10
+case(2): Order(1),Order(1), Order(1) ===>Random
 
-1. Click the **New file** button at the top of the **Source** page.
-2. Give the file a filename of **contributors.txt**.
-3. Enter your name in the empty file space.
-4. Click **Commit** and then **Commit** again in the dialog.
-5. Go back to the **Source** page.
+Ex1:-
+===
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+class Calculator {
 
-Before you move on, go ahead and explore the repository. You've already seen the **Source** page, but check out the **Commits**, **Branches**, and **Settings** pages.
+	@Test
+	@Order(9)
+	public void addTest(){
+		Calculater c=new Calculater();
+		int actual  = c.add(10,20);
+		int expected = 30;
+		Assertions.assertEquals(actual,expected);
+	}
+	@Test
+	@Order(6)
+	public void multiplyTest(){
+		Calculater c=new Calculater();
+		int actual  = c.mul(10,20);
+		int expected = 200;
+		Assertions.assertEquals(actual,expected);
+	}
+	@Test
+	@Order(3)
+	public void subtractTest(){
+		Calculater c=new Calculater();
+		int actual  = c.subtract(10,20);
+		int expected = -10;
+		Assertions.assertEquals(actual,expected);
+	}
+}
 
----
+(3). @BeforeEach :- To Execute logic once per each method Before starting it.
+===================
+Ex:-
+====
+@BeforeEach
+public void initialSetUp(){
+    System.out.println("initialsetup");
+}
 
-## Clone a repository
+(4). @AfterEach :-To Execute logic once per each method After starting it.
+=================
+Ex:-
+======
+@AfterEach
+public void initialSetUp(){
+    System.out.println("finalsetup");
+}
 
-Use these steps to clone from SourceTree, our client for using the repository command-line free. Cloning allows you to work on your files locally. If you don't yet have SourceTree, [download and install first](https://www.sourcetreeapp.com/). If you prefer to clone from the command line, see [Clone a repository](https://confluence.atlassian.com/x/4whODQ).
+(5). @BeforeAll:-To Execute logic Only One time per all methods before starting it.
+=================
 
-1. You’ll see the clone button under the **Source** heading. Click that button.
-2. Now click **Check out in SourceTree**. You may need to create a SourceTree account or log in.
-3. When you see the **Clone New** dialog in SourceTree, update the destination path and name if you’d like to and then click **Clone**.
-4. Open the directory you just created to see your repository’s files.
+Ex:-
+@BeforeAll
+public static  void initilsetUpBeoreAll(){
+    System.out.println("Before All");
+}
 
-Now that you're more familiar with your Bitbucket repository, go ahead and add a new file locally. You can [push your change back to Bitbucket with SourceTree](https://confluence.atlassian.com/x/iqyBMg), or you can [add, commit,](https://confluence.atlassian.com/x/8QhODQ) and [push from the command line](https://confluence.atlassian.com/x/NQ0zDQ).
+(6). @AfterAll:-To Execute logic Only One time per all methods After starting it.
+================
+
+Ex:-
+@AfterAll
+public static  void initilsetUpBeoreAll(){
+    System.out.println("Before All");
+}
+
+(7). @DisplyName("METHOD OR CLASS NAME"):- This method can be used to specify display name in junit console.
+========================================
+
+Ex:-
+@Test
+@Order(3)
+@DisplayName("TESTING SUBTRACT METHOD")
+public void subtractTest(){
+    Calculater c=new Calculater();
+    int actual  = c.subtract(10,20);
+    int expected = -10;
+    Assertions.assertEquals(actual,expected);
+}
+
+(8). @Disabled:- this annotation is used to ignore a test method
+================
+@Test
+@Order(9)
+@Disabled
+@DisplayName("TESTING ADD METHOD")
+public void addTest(){
+    Calculater c=new Calculater();
+    int actual  = c.add(10,20);
+    int expected = 30;
+    Assertions.assertEquals(actual,expected);
+}
+
+(9). @RepetedTest:-
+================== To Test a method specific number of times
+Ex:-
+@Test
+@Order(3)
+@RepeatedTest(value = 3)
+@DisplayName("REPETED TEST FOR SUBTRACT METHOD")
+public void subtractTest(){
+    Calculater c=new Calculater();
+    int actual  = c.subtract(10,20);
+    int expected = -10;
+    Assertions.assertEquals(actual,expected);
+}
+
+(10). @Tag("EnvironmentName"):-
+==================================
+ To Specify Execution Environment we can use this @Tag Annotation.
+ 
+Ex1:-
+@Test
+@Order(6)
+@Tag("prod")
+@DisplayName("TESTING MULTIPLY METHOD")
+public void multiplyTest(){
+    Calculater c=new Calculater();
+    int actual  = c.mul(10,20);
+    int expected = 200;
+    Assertions.assertEquals(actual,expected);
+}
+Ex2:
+@Test
+@Order(6)
+@Tag("prod")
+@DisplayName("TESTING MULTIPLY METHOD")
+public void multiplyTest(){
+    Calculater c=new Calculater();
+    int actual  = c.mul(10,20);
+    int expected = 200;
+    Assertions.assertEquals(actual,expected);
+}
+Ex3:
+@Test
+@Order(6)
+@Tag("qa")
+@DisplayName("TESTING MULTIPLY METHOD")
+public void multiplyTest(){
+    Calculater c=new Calculater();
+    int actual  = c.mul(10,20);
+    int expected = 200;
+    Assertions.assertEquals(actual,expected);
+}
+
+=======================================================JUNIT 5 Assertions================================================
+We can use this to check actual values with expected values in testing
+
+
+
+
+==========================================================================================================================
+==========================================================================================================================
+SpringBootTesting and Jacoco coverrage referes============================================================================
+==========================================================================================================================
+https://natritmeyer.com/howto/reporting-aggregated-unit-and-integration-test-coverage-with-jacoco/

@@ -1,19 +1,9 @@
 package com.app.model;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 
 
@@ -50,6 +40,17 @@ public class User  implements Serializable {
 	           inverseJoinColumns = {@JoinColumn(name="roleId")}
 	          )
 	private Set<Role> roles;
+
+	public User() {
+		super();
+	}
+
+	public User(Integer userId, String userName, String userEmail, String userPwd) {
+		this.userId = userId;
+		this.userName = userName;
+		this.userEmail = userEmail;
+		this.userPwd = userPwd;
+	}
 
 	public Integer getUserId() {
 		return userId;
@@ -138,8 +139,6 @@ public class User  implements Serializable {
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
-    
-	
 
 	
 }
