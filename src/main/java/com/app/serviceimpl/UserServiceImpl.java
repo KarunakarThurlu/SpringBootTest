@@ -109,10 +109,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     @CacheEvict(value = "usercache", key = "#userId")
     public void deleteUserById(Integer userId) {
-        repo.findById(userId)
-                .ifPresentOrElse(repo::delete, () -> {
-                    throw new RuntimeException("Not Found");
-                });
+        repo.deleteById(userId);
     }
 
     @Override

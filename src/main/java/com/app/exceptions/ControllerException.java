@@ -1,8 +1,5 @@
 package com.app.exceptions;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class ControllerException extends RuntimeException{
 
     private String errorCode;

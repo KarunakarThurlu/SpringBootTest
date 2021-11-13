@@ -1,11 +1,12 @@
 package com.app.exceptions;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class ServiceException extends RuntimeException{
 
-    private String errorCode;
+    /**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
+	private String errorCode;
     private String errorMessage;
 
     public ServiceException(String errorCode, String errorMessage) {
