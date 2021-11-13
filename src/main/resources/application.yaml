@@ -11,7 +11,7 @@ spring:
     name: SpringBootTest
     version: 1.0.0
   datasource:
-     url: jdbc:postgresql://127.0.0.1:5432/testdb
+     url: jdbc:postgresql://host.docker.internal:5432/testdb
      username: postgres
      password: postgres
   jpa:
