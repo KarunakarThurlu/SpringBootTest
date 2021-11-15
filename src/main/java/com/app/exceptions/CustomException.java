@@ -1,18 +1,21 @@
 package com.app.exceptions;
 
-public class ServiceException extends RuntimeException{
+public class CustomException extends RuntimeException{
 
-    /**
-	 *
-	 */
+   
 	private static final long serialVersionUID = 1L;
-	private String errorCode;
-    private String errorMessage;
+	private  String errorCode;
+    private  String errorMessage;
 
-    public ServiceException(String errorCode, String errorMessage) {
+    public CustomException(String errorCode, String errorMessage) {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
+
+    public CustomException(){
+        super();
+    }
+
     public String getErrorCode() {
         return errorCode;
     }
