@@ -12,6 +12,7 @@ target/
 .settings
 .springBeans
 .sts4-cache
+thunder-tests/
 
 ### IntelliJ IDEA ###
 .idea
@@ -20,6 +21,7 @@ target/
 *.ipr
 *.log
 *.gz
+.attach_pid*
 
 ### NetBeans ###
 /nbproject/private/

@@ -1,14 +1,18 @@
 package com.app.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BinaryOperator;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,12 +32,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.app.constants.CommonConstants;
-import com.app.exceptions.CustomException;
 import com.app.iservice.IUserService;
 import com.app.model.Response;
 import com.app.model.User;
 import com.app.pojos.LoginPojo;
+import com.app.pojos.UserDTO;
+import com.app.securityconfig.JwtConstants;
 import com.app.securityconfig.JwtUtil;
+import com.app.serviceimpl.GetUserDetailsUtil;
 
 
 @RestController
@@ -51,6 +57,9 @@ public class UserController {
 
 	@Autowired
 	private JwtUtil jwtTokenUtil;
+	
+	@Autowired
+	private GetUserDetailsUtil getUserDetails;
 
 	@PostMapping(value = "/login")
 	public ResponseEntity<Map<String, String>> login(@RequestBody LoginPojo user) {
@@ -65,6 +74,7 @@ public class UserController {
 			return new ResponseEntity<>(m, HttpStatus.ACCEPTED);
 		} catch (BadCredentialsException e) {
 			m.put(message, CommonConstants.AUTH_FAIL);
+			logger.error("Authentication fails for : {}",user.getEmail());
 			return new ResponseEntity<>(m, HttpStatus.UNAUTHORIZED);
 		} catch (Exception e) {
 			m.put(message, e.getMessage());
@@ -73,81 +83,79 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/signup")
-	public Response<User> saveUser(@RequestBody User user) {
+	public Response<UserDTO> saveUser(@RequestBody UserDTO user) {
 		User userExists = userService.findByUserEmail(user.getUserEmail());
 		if (userExists != null) {
-			return new Response<>(user, "User Already exists with this " + user.getUserEmail() + " email", HttpStatus.ACCEPTED);
+			return new Response<>(user, "User Already exists with this " + user.getUserEmail() + " email", HttpStatus.BAD_REQUEST);
 		} else {
 			user.setUserId(null);
 			user.setStatus(User.STATUS.ACTIVE.name());
-			User savedUser = userService.saveUser(user);
+			UserDTO savedUser = userService.saveUser(user);
 			return new Response<>(savedUser, "User Saved Successfully", HttpStatus.ACCEPTED);
 		}
 	}
 
 	@GetMapping("/getuser/{id}")
-	public Response<User> getUserById(@PathVariable("id") int userId) {
-		User user=  userService.findById(userId).orElseThrow(() -> new CustomException(CommonConstants.NOT_FOUND,CommonConstants.USER_NOT_FOUND));
-		return new Response<>(user, "OK", HttpStatus.OK);
+	public Response<UserDTO> getUserById(@PathVariable("id") int userId) {
+		UserDTO userDTO =  userService.findById(userId);
+		return new Response<>(userDTO, "OK", HttpStatus.OK);
 	}
 
 	@GetMapping("/getallusers")
-	public Response<List<User>> getAllUsers() {
-		List<User> users = userService.findAllUsers();
+	public Response<List<UserDTO>> getAllUsers() {
+		List<UserDTO> users = userService.findAllUsers();
 		return new Response<>(users, "OK", HttpStatus.OK);
 	}
 
 	@DeleteMapping("/deleteuser/{id}")
-	public Response<User> deleteUserById(@PathVariable("id") Integer userId) {
-		User user = userService.findById(userId).orElseThrow(() -> new CustomException(CommonConstants.NOT_FOUND, CommonConstants.USER_NOT_FOUND));
-		if (user != null) {
+	public Response<UserDTO> deleteUserById(@PathVariable("id") Integer userId) {
+		UserDTO user = userService.findById(userId);
+		if (user != null)
 			userService.deleteUserById(userId);
-			return new Response<>(null, "User Deleted Successfully", HttpStatus.OK);
-		}
-		return null;
+		return new Response<>(null, "User Deleted Successfully", HttpStatus.OK);
 	}
 
 	@PutMapping("/updateuser")
-	public Response<User> updateUser(@RequestBody User user) {
+	public Response<UserDTO> updateUser(@RequestBody UserDTO user) {
 		logger.info("udating user");
 		if (user.getUserId() != null) {
-			Integer userID = user.getUserId();
-			User userFromDB = userService.findById(userID).orElseThrow(() -> new CustomException(CommonConstants.NOT_FOUND, CommonConstants.USER_NOT_FOUND));
-			User updatedUser = foo.apply(userFromDB, user);
+			UserDTO updatedUser = userService.updateUser(user);
 			return new Response<>(updatedUser, "User Details Updated Successfully", HttpStatus.OK);
 		}
 		return new Response<>(null, "UserId is required for updating user.", HttpStatus.BAD_REQUEST);
 	}
 
-	BinaryOperator<User> foo = (userFromDB, userFromUI) -> {
-		userFromDB.setUserDob(userFromUI.getUserDob());
-		userFromDB.setUserGender(userFromUI.getUserGender());
-		userFromDB.setUserName(userFromUI.getUserName());
-		userFromDB.setUserPhono(userFromUI.getUserPhono());
-		userFromDB.setStatus(User.STATUS.ACTIVE.name());
-		return userService.updateUser(userFromDB);
-
-	};
-
-
 	@GetMapping("/searchuser")
-	public Response<List<User>> searchUser(@RequestParam String searchKey) {
-		List<User> users = userService.searchUser(searchKey);
+	public Response<List<UserDTO>> searchUser(@RequestParam String searchKey) {
+		List<UserDTO> users = userService.searchUser(searchKey);
 		if (users.isEmpty())
 			return new Response<>(null, "Users Not Found", HttpStatus.BAD_REQUEST);
 		else
 			return new Response<>(users, "OK", HttpStatus.OK);
 	}
 
-	@PostMapping("/uploadingfile")
-	public Response<String> uploadFile(@RequestParam(value = "file") MultipartFile file) {
+	@PostMapping("/uploadprofile")
+	public Response<String> uploadFile(HttpServletRequest request,HttpServletResponse response,@RequestParam(value = "file") MultipartFile file) throws IOException {
 		if (file != null && !file.isEmpty()) {
-			String result = userService.uploadFile(file);
+			User user=getUserDetails.getUserDetailsFromAuthToken(request.getHeader(JwtConstants.HEADER_STRING));
+			UserDTO userDTO=new UserDTO();
+			userDTO.setUserProfile(file.getBytes());
+			userDTO.setUserId(user.getUserId());
+			String result = userService.uploadFile(userDTO);
 			return new Response<>(null, result, HttpStatus.OK);
 		} else {
-			return new Response<>(null, "file dos't exist", HttpStatus.BAD_REQUEST);
+			return new Response<>(null, "Please select file", HttpStatus.BAD_REQUEST);
 		}
-
+	}
+	
+	@GetMapping("/getprofile/{userId}")
+	public ResponseEntity<byte[]> uploadFile(@PathVariable Integer userId) {
+		if (userId != null ) {
+			UserDTO userDto = userService.findById(userId);
+			return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(userDto.getUserProfile());
+		} else {
+			return null;
+		}
 	}
 
 }
