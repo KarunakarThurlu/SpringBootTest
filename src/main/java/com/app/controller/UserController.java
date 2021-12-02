@@ -109,10 +109,8 @@ public class UserController {
 
 	@DeleteMapping("/deleteuser/{id}")
 	public Response<UserDTO> deleteUserById(@PathVariable("id") Integer userId) {
-		UserDTO user = userService.findById(userId);
-		if (user != null)
-			userService.deleteUserById(userId);
-		return new Response<>(null, "User Deleted Successfully", HttpStatus.OK);
+		String message = userService.deleteUserById(userId);
+		return new Response<>(null, message, HttpStatus.OK);
 	}
 
 	@PutMapping("/updateuser")

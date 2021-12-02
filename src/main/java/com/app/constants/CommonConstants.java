@@ -2,9 +2,6 @@ package com.app.constants;
 
 public class CommonConstants {
 
-    public CommonConstants(){
-        super();
-    }
 
 
     public static final String ERROR_CODE = "ErrorCode";

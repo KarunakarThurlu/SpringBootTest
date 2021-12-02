@@ -64,7 +64,9 @@ public class SpringBootSecurity  extends WebSecurityConfigurerAdapter{
 		.anyRequest().authenticated()
 		.and()
 		.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+		.and().formLogin().disable();
+		
 		http
 		.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
 

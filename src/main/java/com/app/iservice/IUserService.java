@@ -11,7 +11,7 @@ public interface IUserService {
 	User getUserForAuthCheck(String email);
 	UserDTO saveUser(UserDTO u);
 	User findByUserEmail(String email);
-	void deleteUserById(Integer userId);
+	String deleteUserById(Integer userId);
 	List<UserDTO> findAllUsers();
 	UserDTO findById(Integer userId);
 	String sendMail();

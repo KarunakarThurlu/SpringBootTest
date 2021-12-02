@@ -118,10 +118,38 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<jvmArguments>${argLine}</jvmArguments>
+				</configuration>
+				<executions>
+					<execution>
+						<id>start-spring-boot</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>stop-spring-boot</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>3.0.0-M4</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
@@ -129,14 +157,14 @@
 				<version>0.8.5</version>
 				<executions>
 					<execution>
-						<id>jacoco-initialize</id>
+						<id>default-prepare-agent</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
 					</execution>
 					<execution>
-						<id>jacoco-site</id>
-						<phase>test</phase>
+						<id>default-report</id>
+						<phase>verify</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>

@@ -115,8 +115,11 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	@CacheEvict(value = "usercache", key = "#userId")
-	public void deleteUserById(Integer userId) {
-		repo.deleteById(userId);
+	public String deleteUserById(Integer userId) {
+		User user = repo.findById(userId).orElseThrow(()->new CustomException(CommonConstants.NOT_FOUND,CommonConstants.USER_NOT_FOUND));
+		if(user!=null)
+			repo.deleteById(user.getUserId());
+		return CommonConstants.USER_DELETED;
 	}
 
 	@Override
