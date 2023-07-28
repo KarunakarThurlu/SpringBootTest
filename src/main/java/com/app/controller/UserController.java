@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +38,9 @@ import com.app.securityconfig.JwtConstants;
 import com.app.securityconfig.JwtUtil;
 import com.app.serviceimpl.GetUserDetailsUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 
 @RestController
 @RequestMapping("/api")
@@ -63,7 +63,7 @@ public class UserController {
 
 	@PostMapping(value = "/login")
 	public ResponseEntity<Map<String, String>> login(@RequestBody LoginPojo user) {
-		String message = "Messasge";
+		String message = "message";
 		Map<String, String> m = new HashMap<>();
 		try {
 			final Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
@@ -147,7 +147,7 @@ public class UserController {
 	}
 	
 	@GetMapping("/getprofile/{userId}")
-	public ResponseEntity<byte[]> uploadFile(@PathVariable Integer userId) {
+	public ResponseEntity<byte[]> getProfilePhoto(@PathVariable Integer userId) {
 		if (userId != null ) {
 			UserDTO userDto = userService.findById(userId);
 			return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(userDto.getUserProfile());

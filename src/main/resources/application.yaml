@@ -1,6 +1,9 @@
 
 server:
   port: 8083
+springdoc:
+  paths-to-match:
+  - /**
 spring:
   application:
     name: SpringBootTest

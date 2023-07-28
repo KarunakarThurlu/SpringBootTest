@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.app.iservice.IUserService;
 import com.app.model.User;
-import com.app.repo.UserRepo;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService{

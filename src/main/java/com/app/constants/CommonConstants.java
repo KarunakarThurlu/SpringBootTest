@@ -17,7 +17,7 @@ public class CommonConstants {
     public static final String LOGOUT_SUCCESS = "Logout Success";
     public static final String AUTH_TOKEN_HEADER = "Authorization";
     public static final String AUTH_TOKEN_PREFIX = "Bearer ";
-    public static final String AUTH_FAIL="Invalid UserNAme or Password";
+    public static final String AUTH_FAIL="Invalid UserName or Password";
     public static final String AUTH_TOKEN="authToken";
     public static final String INVALID_AUTH_TOKEN="Invalid Auth Token";
     public static final String INVALID_USER="Invalid User";

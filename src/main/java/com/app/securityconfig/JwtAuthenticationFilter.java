@@ -1,15 +1,9 @@
 package com.app.securityconfig;
 
-import static com.app.securityconfig.JwtConstants.TOKEN_PREFIX;
-
 import java.io.IOException;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,8 +13,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.app.serviceimpl.CustomUserDetailsService;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.SignatureException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import static com.app.securityconfig.JwtConstants.TOKEN_PREFIX;;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter{
@@ -31,6 +29,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 	@Autowired
 	private CustomUserDetailsService customUserDetailsService;
 
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+		 // look for Bearer auth header
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        	filterChain.doFilter(request, response);
+            return;
+        }
+
+        final String token = authHeader.replace(TOKEN_PREFIX,"");
+        final boolean isValid = jwtUtil.validateJwtToken(token);
+        if (!isValid) {
+            // validation failed or token expired
+        	filterChain.doFilter(request, response);
+            return;
+        }
+
+        // set user details on spring security context
+        final String userName = jwtUtil.getUsernameFromToken(token);
+        final UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
+        final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // continue with authenticated user
+        filterChain.doFilter(request, response);
+	}
+
+	/*
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
 
@@ -67,7 +94,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
 			UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-			if (jwtUtil.validateToken(authToken, userDetails)) {
+			if (jwtUtil.validateJwtToken(authToken, userDetails)) {
 				UsernamePasswordAuthenticationToken authentication = jwtUtil.getAuthentication(authToken, SecurityContextHolder.getContext().getAuthentication(), userDetails);
 				//UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")));
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -78,6 +105,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
 		filterChain.doFilter(request, response);
 
-	}
+	} */
 
 }

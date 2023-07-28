@@ -7,9 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
-
-import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,13 +28,15 @@ import com.app.pojos.UserDTO;
 import com.app.repo.RoleRepository;
 import com.app.repo.UserRepo;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class UserServiceImpl implements IUserService {
 
 	private static Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
 	@Autowired
-	private BCryptPasswordEncoder bcryptPasswordEncoder;
+	private PasswordEncoder bcryptPasswordEncoder;
 
 	@Autowired
 	private UserRepo repo;
@@ -103,7 +102,7 @@ public class UserServiceImpl implements IUserService {
 		return users
 				.stream()
 				.map(u->convertUserEntityIntoUserDTO.apply(u))
-				.collect(Collectors.toList());
+				.toList();
 	}
 
 	@Override
@@ -143,11 +142,11 @@ public class UserServiceImpl implements IUserService {
 		return users
 				.stream()
 				.map(u->convertUserEntityIntoUserDTO.apply(u))
-				.collect(Collectors.toList());
+				.toList();
 	}
 	@Override
 	public String uploadFile(UserDTO userDTO) {
-		User user =repo.findById(userDTO.getUserId()).orElseThrow(()->new CustomException(CommonConstants.NOT_FOUND,CommonConstants.USER_NOT_FOUND));
+		User user = repo.findById(userDTO.getUserId()).orElseThrow(()->new CustomException(CommonConstants.NOT_FOUND,CommonConstants.USER_NOT_FOUND));
 		user.setUserId(userDTO.getUserId());
 		user.setUserProfile(userDTO.getUserProfile());
 		repo.save(user);
