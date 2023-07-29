@@ -47,8 +47,8 @@ public class SpringBootSecurity {
 	public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
 
 		httpSecurity.cors().and().csrf().disable().authorizeHttpRequests()
-				.requestMatchers("/api/login", "/api/signup", "/actuator/**", "/swagger*/**", "/webjars/**",
-						"/v3/api-docs")
+				.requestMatchers("/api/login", "/api/signup", "/actuator/**", "/swagger-ui*/**", "/webjars/**",
+						"/v3/api-docs","/v3/api-docs/swagger-config")
 				.permitAll().anyRequest().authenticated().and().exceptionHandling()
 				.authenticationEntryPoint(unauthorizedHandler).and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().formLogin().disable();

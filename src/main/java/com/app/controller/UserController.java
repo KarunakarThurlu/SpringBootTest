@@ -38,6 +38,11 @@ import com.app.securityconfig.JwtConstants;
 import com.app.securityconfig.JwtUtil;
 import com.app.serviceimpl.GetUserDetailsUtil;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -62,6 +67,8 @@ public class UserController {
 	private GetUserDetailsUtil getUserDetails;
 
 	@PostMapping(value = "/login")
+	@Operation(summary = "Authenticate user and generate JWT token")
+    @ApiResponse(responseCode = "202", description = "Accepted", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class)))
 	public ResponseEntity<Map<String, String>> login(@RequestBody LoginPojo user) {
 		String message = "message";
 		Map<String, String> m = new HashMap<>();
