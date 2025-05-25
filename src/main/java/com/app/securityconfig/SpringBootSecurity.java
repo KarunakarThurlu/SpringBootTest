@@ -28,33 +28,40 @@ public class SpringBootSecurity {
 	private JwtAuthenticationEntryPoint unauthorizedHandler;
 
 	@Bean
-	public JwtAuthenticationFilter authenticationJwtTokenFilter() {
+	JwtAuthenticationFilter authenticationJwtTokenFilter() {
 		return new JwtAuthenticationFilter();
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
 	@Bean
-	public AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration)
+	AuthenticationManager authenticationManager(final AuthenticationConfiguration authenticationConfiguration)
 			throws Exception {
 		return authenticationConfiguration.getAuthenticationManager();
 	}
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-
-		httpSecurity.cors().and().csrf().disable().authorizeHttpRequests()
-				.requestMatchers("/api/login", "/api/signup", "/actuator/**", "/swagger-ui*/**", "/webjars/**",
-						"/v3/api-docs","/v3/api-docs/swagger-config")
-				.permitAll().anyRequest().authenticated().and().exceptionHandling()
-				.authenticationEntryPoint(unauthorizedHandler).and().sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().formLogin().disable();
-		httpSecurity.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-		return httpSecurity.build();
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	    return http
+	        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+	        .csrf(csrf -> csrf.disable())
+	        .authorizeHttpRequests(auth -> auth
+	            .requestMatchers(
+	                "/actuator/**", "/swagger-ui*/**", 
+	                "/webjars/**", "/v3/api-docs", "/v3/api-docs/swagger-config"
+	            ).permitAll()
+	            .anyRequest().authenticated()
+	        )
+	        .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
+	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	        .formLogin(form -> form.disable())
+	        .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
+	        .build();
 	}
+
 
 	
 	@Bean

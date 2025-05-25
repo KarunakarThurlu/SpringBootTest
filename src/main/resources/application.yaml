@@ -1,20 +1,56 @@
-
-server:
-  port: 8083
 spring:
-  application:
-    name: SpringBootTest
+  main:
+    banner-mode: off
+  profiles:
+    active:
+    - local
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: 
+    password: 
+    protocol: smtp
+    default-encoding: UTF-8
+    test-connection: false
+    properties:
+      mail:
+        smtp:
+          starttls :
+            enable : true
+---
+## H2 DB Configuration (Local Environment)
+spring:
+  config:
+    activate:
+      on-profile: local
   datasource:
-     url: jdbc:postgresql://localhost:5432/testdb?useSSL=false
-     username: postgres
-     password: postgres
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
   jpa:
-     show-sql: true
-     properties:
-         hibernate:
-             dialect: org.hibernate.dialect.PostgreSQLDialect
-     hibernate:
-         ddl-auto: update
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+---
+# PostgreSQL Configuration (Other Environments)
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: pguser
+    password: pgpass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
   mail:
     host: 
     port: 587
